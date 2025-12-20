@@ -14,7 +14,134 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      interview_questions: {
+        Row: {
+          correct_option: number | null
+          created_at: string | null
+          feedback: Json | null
+          id: string
+          is_correct: boolean | null
+          mcq_options: Json | null
+          question_mode: string
+          question_text: string
+          score: number | null
+          selected_option: number | null
+          session_id: string
+          user_answer: string | null
+          user_id: string
+        }
+        Insert: {
+          correct_option?: number | null
+          created_at?: string | null
+          feedback?: Json | null
+          id?: string
+          is_correct?: boolean | null
+          mcq_options?: Json | null
+          question_mode: string
+          question_text: string
+          score?: number | null
+          selected_option?: number | null
+          session_id: string
+          user_answer?: string | null
+          user_id: string
+        }
+        Update: {
+          correct_option?: number | null
+          created_at?: string | null
+          feedback?: Json | null
+          id?: string
+          is_correct?: boolean | null
+          mcq_options?: Json | null
+          question_mode?: string
+          question_text?: string
+          score?: number | null
+          selected_option?: number | null
+          session_id?: string
+          user_answer?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "interview_questions_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "interview_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      interview_sessions: {
+        Row: {
+          average_score: number | null
+          completed: boolean | null
+          completed_at: string | null
+          created_at: string | null
+          difficulty: string
+          id: string
+          job_role: string
+          question_mode: string
+          question_type: string
+          total_questions: number | null
+          total_score: number | null
+          user_id: string
+        }
+        Insert: {
+          average_score?: number | null
+          completed?: boolean | null
+          completed_at?: string | null
+          created_at?: string | null
+          difficulty?: string
+          id?: string
+          job_role: string
+          question_mode?: string
+          question_type?: string
+          total_questions?: number | null
+          total_score?: number | null
+          user_id: string
+        }
+        Update: {
+          average_score?: number | null
+          completed?: boolean | null
+          completed_at?: string | null
+          created_at?: string | null
+          difficulty?: string
+          id?: string
+          job_role?: string
+          question_mode?: string
+          question_type?: string
+          total_questions?: number | null
+          total_score?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string | null
+          full_name: string | null
+          id: string
+          preferred_role: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          full_name?: string | null
+          id?: string
+          preferred_role?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          full_name?: string | null
+          id?: string
+          preferred_role?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
