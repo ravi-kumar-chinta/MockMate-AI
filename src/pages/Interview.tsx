@@ -1,19 +1,23 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
+import { CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { 
   ArrowLeft, ArrowRight, Loader2, Play, Timer, 
-  CheckCircle2, XCircle, Star, Send, Trophy
+  CheckCircle2, XCircle, Star, Send, Trophy, Sparkles
 } from "lucide-react";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { AnimatedCard } from "@/components/ui/AnimatedCard";
+import { AnimatedProgress } from "@/components/ui/AnimatedProgress";
+import { GradientButton } from "@/components/ui/GradientButton";
+import { Logo } from "@/components/ui/Logo";
 
 const JOB_ROLES = ["Software Developer", "AI/ML", "Embedded Systems"];
 const DIFFICULTIES = ["Easy", "Medium", "Hard"];
@@ -90,7 +94,6 @@ const Interview = () => {
     if (!user) return;
     setLoading(true);
 
-    // Create session
     const { data: session, error } = await supabase
       .from("interview_sessions")
       .insert({
@@ -178,7 +181,6 @@ const Interview = () => {
       setFeedback(feedbackData);
       setSessionScores([...sessionScores, feedbackData.score]);
 
-      // Save question to database
       await supabase.from("interview_questions").insert({
         session_id: sessionId,
         user_id: user.id,
@@ -239,8 +241,8 @@ const Interview = () => {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      <div className="min-h-screen gradient-page flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
@@ -248,26 +250,30 @@ const Interview = () => {
   // Setup Screen
   if (step === "setup") {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 p-4">
-        <div className="container mx-auto max-w-xl">
-          <Link to="/dashboard" className="inline-flex items-center text-muted-foreground hover:text-foreground mb-6">
-            <ArrowLeft className="w-4 h-4 mr-2" />
+      <div className="min-h-screen gradient-page">
+        <PageHeader />
+        <main className="container mx-auto px-4 py-8 max-w-xl">
+          <Link 
+            to="/dashboard" 
+            className="inline-flex items-center text-muted-foreground hover:text-foreground transition-colors mb-6 group"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2 transition-transform group-hover:-translate-x-1" />
             Back to Dashboard
           </Link>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Play className="w-5 h-5 text-primary" />
-                Configure Interview
-              </CardTitle>
+          <AnimatedCard>
+            <CardHeader className="text-center">
+              <div className="mx-auto p-3 rounded-2xl gradient-brand shadow-brand w-fit mb-4">
+                <Play className="w-6 h-6 text-primary-foreground" />
+              </div>
+              <CardTitle className="text-2xl">Configure Interview</CardTitle>
               <CardDescription>Set up your practice session</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-5">
               <div className="space-y-2">
-                <Label>Job Role</Label>
+                <Label className="text-sm font-medium">Job Role</Label>
                 <Select value={config.jobRole} onValueChange={(v) => setConfig({ ...config, jobRole: v })}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectTrigger className="h-11"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     {JOB_ROLES.map((r) => <SelectItem key={r} value={r}>{r}</SelectItem>)}
                   </SelectContent>
@@ -275,9 +281,9 @@ const Interview = () => {
               </div>
 
               <div className="space-y-2">
-                <Label>Difficulty</Label>
+                <Label className="text-sm font-medium">Difficulty</Label>
                 <Select value={config.difficulty} onValueChange={(v) => setConfig({ ...config, difficulty: v })}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectTrigger className="h-11"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     {DIFFICULTIES.map((d) => <SelectItem key={d} value={d}>{d}</SelectItem>)}
                   </SelectContent>
@@ -285,9 +291,9 @@ const Interview = () => {
               </div>
 
               <div className="space-y-2">
-                <Label>Question Type</Label>
+                <Label className="text-sm font-medium">Question Type</Label>
                 <Select value={config.questionType} onValueChange={(v) => setConfig({ ...config, questionType: v })}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectTrigger className="h-11"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     {QUESTION_TYPES.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
                   </SelectContent>
@@ -295,36 +301,47 @@ const Interview = () => {
               </div>
 
               <div className="space-y-2">
-                <Label>Question Mode</Label>
+                <Label className="text-sm font-medium">Question Mode</Label>
                 <Select value={config.questionMode} onValueChange={(v) => setConfig({ ...config, questionMode: v })}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectTrigger className="h-11"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     {QUESTION_MODES.map((m) => <SelectItem key={m} value={m}>{m === "Normal" ? "Descriptive" : m}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
 
-              <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
-                <div className="flex items-center gap-2">
-                  <Timer className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-sm">Enable Timer</span>
+              <div className="flex items-center justify-between p-4 rounded-xl bg-muted/50 border border-border">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-background">
+                    <Timer className="w-4 h-4 text-muted-foreground" />
+                  </div>
+                  <div>
+                    <span className="text-sm font-medium text-foreground">Enable Timer</span>
+                    <p className="text-xs text-muted-foreground">Simulate real interview pressure</p>
+                  </div>
                 </div>
                 <Button
                   variant={timerEnabled ? "default" : "outline"}
                   size="sm"
                   onClick={() => setTimerEnabled(!timerEnabled)}
+                  className={timerEnabled ? "gradient-brand text-primary-foreground" : ""}
                 >
                   {timerEnabled ? "On" : "Off"}
                 </Button>
               </div>
 
-              <Button onClick={startInterview} disabled={loading} className="w-full" size="lg">
-                {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Play className="w-4 h-4 mr-2" />}
+              <GradientButton 
+                onClick={startInterview} 
+                loading={loading} 
+                className="w-full" 
+                size="lg"
+                icon={<Play className="w-5 h-5" />}
+              >
                 Start Interview
-              </Button>
+              </GradientButton>
             </CardContent>
-          </Card>
-        </div>
+          </AnimatedCard>
+        </main>
       </div>
     );
   }
@@ -336,27 +353,30 @@ const Interview = () => {
       : 0;
 
     return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 p-4">
-        <div className="container mx-auto max-w-xl">
-          <Card>
-            <CardHeader className="text-center">
-              <div className="mx-auto w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                <Trophy className="w-8 h-8 text-primary" />
+      <div className="min-h-screen gradient-page">
+        <PageHeader showNav={false} />
+        <main className="container mx-auto px-4 py-8 max-w-xl">
+          <AnimatedCard className="overflow-hidden">
+            {/* Celebration header */}
+            <div className="gradient-brand p-8 text-center">
+              <div className="mx-auto w-20 h-20 rounded-full bg-primary-foreground/20 flex items-center justify-center mb-4 animate-float">
+                <Trophy className="w-10 h-10 text-primary-foreground" />
               </div>
-              <CardTitle>Interview Complete!</CardTitle>
-              <CardDescription>Here's your performance summary</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
+              <h2 className="text-2xl font-bold text-primary-foreground mb-1">Interview Complete!</h2>
+              <p className="text-primary-foreground/80">Great job on finishing your practice session</p>
+            </div>
+            
+            <CardContent className="p-6 space-y-6">
               <div className="grid grid-cols-2 gap-4">
-                <div className="p-4 rounded-lg bg-muted/50 text-center">
+                <div className="p-4 rounded-xl bg-muted/50 text-center">
                   <p className="text-3xl font-bold text-foreground">{sessionScores.length}</p>
                   <p className="text-sm text-muted-foreground">Questions</p>
                 </div>
-                <div className="p-4 rounded-lg bg-muted/50 text-center">
+                <div className="p-4 rounded-xl bg-muted/50 text-center">
                   <p className={`text-3xl font-bold ${
-                    avgScore >= 7 ? 'text-emerald-600' :
-                    avgScore >= 5 ? 'text-amber-600' :
-                    'text-red-600'
+                    avgScore >= 7 ? 'text-success' :
+                    avgScore >= 5 ? 'text-warning' :
+                    'text-destructive'
                   }`}>{avgScore.toFixed(1)}/10</p>
                   <p className="text-sm text-muted-foreground">Average Score</p>
                 </div>
@@ -364,14 +384,14 @@ const Interview = () => {
 
               <div className="space-y-2">
                 <Label className="text-sm text-muted-foreground">Score Distribution</Label>
-                <div className="flex gap-1">
+                <div className="flex gap-2">
                   {sessionScores.map((score, i) => (
                     <div
                       key={i}
-                      className={`flex-1 h-8 rounded flex items-center justify-center text-xs font-medium text-white ${
-                        score >= 7 ? 'bg-emerald-500' :
-                        score >= 5 ? 'bg-amber-500' :
-                        'bg-red-500'
+                      className={`flex-1 h-12 rounded-lg flex items-center justify-center text-sm font-bold text-primary-foreground transition-all hover:scale-105 ${
+                        score >= 7 ? 'bg-success' :
+                        score >= 5 ? 'bg-warning' :
+                        'bg-destructive'
                       }`}
                     >
                       {score}
@@ -380,72 +400,84 @@ const Interview = () => {
                 </div>
               </div>
 
-              <div className="flex gap-3">
+              <div className="flex gap-3 pt-2">
                 <Button variant="outline" className="flex-1" onClick={() => navigate("/dashboard")}>
                   Dashboard
                 </Button>
-                <Button className="flex-1" onClick={() => {
+                <GradientButton className="flex-1" onClick={() => {
                   setStep("setup");
                   setSessionScores([]);
                   setCurrentQuestionIndex(0);
                   setSessionId(null);
                 }}>
                   New Interview
-                </Button>
+                </GradientButton>
               </div>
             </CardContent>
-          </Card>
-        </div>
+          </AnimatedCard>
+        </main>
       </div>
     );
   }
 
   // Interview Screen
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 p-4">
-      <div className="container mx-auto max-w-2xl">
+    <div className="min-h-screen gradient-page">
+      <PageHeader showNav={false} />
+      <main className="container mx-auto px-4 py-8 max-w-2xl">
         {/* Progress Header */}
-        <div className="mb-6">
-          <div className="flex items-center justify-between mb-2">
+        <div className="mb-6 animate-fade-in">
+          <div className="flex items-center justify-between mb-3">
             <span className="text-sm text-muted-foreground">
-              Question {currentQuestionIndex + 1} of {QUESTIONS_PER_SESSION}
+              Question <span className="font-semibold text-foreground">{currentQuestionIndex + 1}</span> of {QUESTIONS_PER_SESSION}
             </span>
             {timerEnabled && timerActive && (
-              <div className={`flex items-center gap-1 px-3 py-1 rounded-full ${
-                timeLeft < 30 ? 'bg-red-500/10 text-red-600' : 'bg-muted text-muted-foreground'
+              <div className={`flex items-center gap-2 px-4 py-2 rounded-full font-mono text-sm font-medium ${
+                timeLeft < 30 ? 'bg-destructive/10 text-destructive animate-pulse-soft' : 'bg-muted text-muted-foreground'
               }`}>
                 <Timer className="w-4 h-4" />
-                <span className="font-mono text-sm">{formatTime(timeLeft)}</span>
+                {formatTime(timeLeft)}
               </div>
             )}
           </div>
-          <Progress value={((currentQuestionIndex + 1) / QUESTIONS_PER_SESSION) * 100} className="h-2" />
+          <AnimatedProgress value={((currentQuestionIndex + 1) / QUESTIONS_PER_SESSION) * 100} variant="brand" animated />
         </div>
 
         {/* Question Card */}
-        <Card className="mb-4">
-          <CardHeader>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="px-2 py-0.5 rounded text-xs font-medium bg-primary/10 text-primary">
+        <AnimatedCard className="mb-4">
+          <CardHeader className="pb-4">
+            <div className="flex items-center gap-2 mb-3 flex-wrap">
+              <span className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-primary/10 text-primary">
                 {config.jobRole}
               </span>
-              <span className={`px-2 py-0.5 rounded text-xs font-medium ${
-                config.difficulty === 'Easy' ? 'bg-emerald-500/10 text-emerald-600' :
-                config.difficulty === 'Medium' ? 'bg-amber-500/10 text-amber-600' :
-                'bg-red-500/10 text-red-600'
+              <span className={`px-2.5 py-1 rounded-lg text-xs font-semibold ${
+                config.difficulty === 'Easy' ? 'bg-success/10 text-success' :
+                config.difficulty === 'Medium' ? 'bg-warning/10 text-warning' :
+                'bg-destructive/10 text-destructive'
               }`}>
                 {config.difficulty}
               </span>
-              <span className="px-2 py-0.5 rounded text-xs font-medium bg-muted text-muted-foreground">
+              <span className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-muted text-muted-foreground">
                 {config.questionType}
               </span>
             </div>
-            <CardTitle className="text-lg">{loading ? "Loading question..." : question?.question}</CardTitle>
+            <CardTitle className="text-lg leading-relaxed">
+              {loading && !question ? (
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  Generating question...
+                </div>
+              ) : question?.question}
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            {loading ? (
-              <div className="flex items-center justify-center py-8">
-                <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            {loading && !question ? (
+              <div className="flex flex-col items-center justify-center py-12">
+                <div className="relative">
+                  <div className="w-16 h-16 rounded-full gradient-brand animate-pulse" />
+                  <Sparkles className="w-6 h-6 text-primary-foreground absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+                </div>
+                <p className="text-sm text-muted-foreground mt-4">AI is crafting your question...</p>
               </div>
             ) : config.questionMode === "MCQ" && question?.options ? (
               <RadioGroup
@@ -455,26 +487,29 @@ const Interview = () => {
                 className="space-y-3"
               >
                 {question.options.map((option, i) => (
-                  <div key={i} className={`flex items-center space-x-3 p-3 rounded-lg border transition-colors ${
-                    showFeedback
-                      ? i === question.correctOption
-                        ? 'border-emerald-500 bg-emerald-500/10'
+                  <div 
+                    key={i} 
+                    className={`flex items-center space-x-3 p-4 rounded-xl border-2 transition-all duration-200 ${
+                      showFeedback
+                        ? i === question.correctOption
+                          ? 'border-success bg-success/10'
+                          : selectedOption === i
+                            ? 'border-destructive bg-destructive/10'
+                            : 'border-border'
                         : selectedOption === i
-                          ? 'border-red-500 bg-red-500/10'
-                          : 'border-border'
-                      : selectedOption === i
-                        ? 'border-primary bg-primary/5'
-                        : 'border-border hover:border-primary/50'
-                  }`}>
+                          ? 'border-primary bg-primary/5 shadow-sm'
+                          : 'border-border hover:border-primary/50 hover:bg-muted/50'
+                    }`}
+                  >
                     <RadioGroupItem value={i.toString()} id={`option-${i}`} />
-                    <Label htmlFor={`option-${i}`} className="flex-1 cursor-pointer">
+                    <Label htmlFor={`option-${i}`} className="flex-1 cursor-pointer text-sm">
                       {option}
                     </Label>
                     {showFeedback && i === question.correctOption && (
-                      <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+                      <CheckCircle2 className="w-5 h-5 text-success" />
                     )}
                     {showFeedback && selectedOption === i && i !== question.correctOption && (
-                      <XCircle className="w-5 h-5 text-red-500" />
+                      <XCircle className="w-5 h-5 text-destructive" />
                     )}
                   </div>
                 ))}
@@ -484,99 +519,107 @@ const Interview = () => {
                 value={answer}
                 onChange={(e) => setAnswer(e.target.value)}
                 placeholder="Type your answer here..."
-                className="min-h-[150px]"
+                className="min-h-[180px] resize-none text-base"
                 disabled={showFeedback}
               />
             )}
 
-            {!showFeedback && (
-              <Button
+            {!showFeedback && question && (
+              <GradientButton
                 onClick={handleSubmitAnswer}
                 disabled={loading || (config.questionMode === "MCQ" ? selectedOption === null : !answer.trim())}
                 className="w-full mt-4"
+                size="lg"
+                loading={loading}
+                icon={<Send className="w-4 h-4" />}
               >
-                {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Send className="w-4 h-4 mr-2" />}
                 Submit Answer
-              </Button>
+              </GradientButton>
             )}
           </CardContent>
-        </Card>
+        </AnimatedCard>
 
         {/* Feedback Card */}
         {showFeedback && feedback && (
-          <Card className="mb-4 border-primary/20">
-            <CardHeader>
+          <AnimatedCard className="border-primary/20 animate-slide-up">
+            <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-lg">Feedback</CardTitle>
                 <div className="flex items-center gap-1">
                   {[...Array(5)].map((_, i) => (
                     <Star
                       key={i}
-                      className={`w-5 h-5 ${
+                      className={`w-5 h-5 transition-all ${
                         i < Math.round(feedback.score / 2)
-                          ? 'text-amber-400 fill-amber-400'
-                          : 'text-muted-foreground'
+                          ? 'text-warning fill-warning'
+                          : 'text-muted-foreground/30'
                       }`}
                     />
                   ))}
-                  <span className="ml-2 font-bold text-foreground">{feedback.score}/10</span>
+                  <span className="ml-2 font-bold text-foreground text-lg">{feedback.score}/10</span>
                 </div>
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Score Progress */}
-              <div className="space-y-1">
+              <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Score</span>
-                  <span className={`font-medium ${
-                    feedback.score >= 7 ? 'text-emerald-600' :
-                    feedback.score >= 5 ? 'text-amber-600' :
-                    'text-red-600'
+                  <span className={`font-semibold ${
+                    feedback.score >= 7 ? 'text-success' :
+                    feedback.score >= 5 ? 'text-warning' :
+                    'text-destructive'
                   }`}>{feedback.score}/10</span>
                 </div>
-                <Progress value={feedback.score * 10} className="h-2" />
+                <AnimatedProgress value={feedback.score * 10} animated />
               </div>
 
               {config.questionMode === "MCQ" && feedback.explanation && (
-                <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/20">
-                  <p className="text-sm font-medium text-blue-700 mb-1">Explanation</p>
+                <div className="p-4 rounded-xl bg-accent/10 border border-accent/20">
+                  <p className="text-sm font-semibold text-accent mb-1">Explanation</p>
                   <p className="text-sm text-foreground">{feedback.explanation}</p>
                 </div>
               )}
 
               {feedback.strengths && feedback.strengths.length > 0 && (
-                <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
-                  <p className="text-sm font-medium text-emerald-700 mb-2 flex items-center gap-1">
+                <div className="p-4 rounded-xl bg-success/10 border border-success/20">
+                  <p className="text-sm font-semibold text-success mb-2 flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4" />
                     What you did well
                   </p>
-                  <ul className="space-y-1">
+                  <ul className="space-y-1.5">
                     {feedback.strengths.map((s, i) => (
-                      <li key={i} className="text-sm text-foreground">• {s}</li>
+                      <li key={i} className="text-sm text-foreground flex items-start gap-2">
+                        <span className="text-success mt-1">•</span>
+                        {s}
+                      </li>
                     ))}
                   </ul>
                 </div>
               )}
 
               {feedback.improvements && feedback.improvements.length > 0 && (
-                <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
-                  <p className="text-sm font-medium text-amber-700 mb-2">Areas for improvement</p>
-                  <ul className="space-y-1">
+                <div className="p-4 rounded-xl bg-warning/10 border border-warning/20">
+                  <p className="text-sm font-semibold text-warning mb-2">Areas for improvement</p>
+                  <ul className="space-y-1.5">
                     {feedback.improvements.map((s, i) => (
-                      <li key={i} className="text-sm text-foreground">• {s}</li>
+                      <li key={i} className="text-sm text-foreground flex items-start gap-2">
+                        <span className="text-warning mt-1">•</span>
+                        {s}
+                      </li>
                     ))}
                   </ul>
                 </div>
               )}
 
               {feedback.sampleAnswer && (
-                <div className="p-3 rounded-lg bg-muted/50 border border-border">
-                  <p className="text-sm font-medium text-muted-foreground mb-2">Sample Answer</p>
-                  <p className="text-sm text-foreground">{feedback.sampleAnswer}</p>
+                <div className="p-4 rounded-xl bg-muted/50 border border-border">
+                  <p className="text-sm font-semibold text-muted-foreground mb-2">Sample Answer</p>
+                  <p className="text-sm text-foreground leading-relaxed">{feedback.sampleAnswer}</p>
                 </div>
               )}
 
-              <Button onClick={handleNextQuestion} className="w-full">
+              <GradientButton onClick={handleNextQuestion} className="w-full" size="lg" loading={loading}>
                 {currentQuestionIndex + 1 >= QUESTIONS_PER_SESSION ? (
                   <>
                     <Trophy className="w-4 h-4 mr-2" />
@@ -584,15 +627,15 @@ const Interview = () => {
                   </>
                 ) : (
                   <>
-                    <ArrowRight className="w-4 h-4 mr-2" />
                     Next Question
+                    <ArrowRight className="w-4 h-4 ml-2" />
                   </>
                 )}
-              </Button>
+              </GradientButton>
             </CardContent>
-          </Card>
+          </AnimatedCard>
         )}
-      </div>
+      </main>
     </div>
   );
 };

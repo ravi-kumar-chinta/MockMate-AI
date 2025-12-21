@@ -2,13 +2,16 @@ import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Save, Loader2, User, Mail, Briefcase, Target, Award } from "lucide-react";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { AnimatedCard } from "@/components/ui/AnimatedCard";
+import { StatCard } from "@/components/ui/StatCard";
+import { GradientButton } from "@/components/ui/GradientButton";
 
 const JOB_ROLES = ["Software Developer", "AI/ML", "Embedded Systems"];
 
@@ -105,26 +108,33 @@ const Profile = () => {
 
   if (authLoading || loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      <div className="min-h-screen gradient-page flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
-      <div className="container mx-auto px-4 py-8 max-w-2xl">
-        <Link to="/dashboard" className="inline-flex items-center text-muted-foreground hover:text-foreground mb-6">
-          <ArrowLeft className="w-4 h-4 mr-2" />
+    <div className="min-h-screen gradient-page">
+      <PageHeader />
+
+      <main className="container mx-auto px-4 py-8 max-w-2xl">
+        <Link 
+          to="/dashboard" 
+          className="inline-flex items-center text-muted-foreground hover:text-foreground transition-colors mb-6 group"
+        >
+          <ArrowLeft className="w-4 h-4 mr-2 transition-transform group-hover:-translate-x-1" />
           Back to Dashboard
         </Link>
 
         <div className="space-y-6">
           {/* Profile Info */}
-          <Card>
+          <AnimatedCard delay={50}>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <User className="w-5 h-5 text-primary" />
+                <div className="p-1.5 rounded-lg gradient-brand-light">
+                  <User className="w-5 h-5 text-primary" />
+                </div>
                 Profile Information
               </CardTitle>
               <CardDescription>Update your personal details</CardDescription>
@@ -137,6 +147,7 @@ const Profile = () => {
                   value={profile.full_name}
                   onChange={(e) => setProfile({ ...profile, full_name: e.target.value })}
                   placeholder="Enter your name"
+                  className="h-11"
                 />
               </div>
               <div className="space-y-2">
@@ -147,7 +158,7 @@ const Profile = () => {
                     id="email"
                     value={user?.email || ""}
                     disabled
-                    className="pl-10 bg-muted"
+                    className="pl-10 h-11 bg-muted"
                   />
                 </div>
               </div>
@@ -157,7 +168,7 @@ const Profile = () => {
                   value={profile.preferred_role}
                   onValueChange={(value) => setProfile({ ...profile, preferred_role: value })}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="h-11">
                     <Briefcase className="w-4 h-4 mr-2 text-muted-foreground" />
                     <SelectValue />
                   </SelectTrigger>
@@ -168,40 +179,31 @@ const Profile = () => {
                   </SelectContent>
                 </Select>
               </div>
-              <Button onClick={handleSave} disabled={saving} className="w-full">
-                {saving ? (
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                ) : (
-                  <Save className="w-4 h-4 mr-2" />
-                )}
+              <GradientButton onClick={handleSave} loading={saving} className="w-full" icon={<Save className="w-4 h-4" />}>
                 Save Changes
-              </Button>
+              </GradientButton>
             </CardContent>
-          </Card>
+          </AnimatedCard>
 
           {/* Stats */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Interview Statistics</CardTitle>
-              <CardDescription>Your overall performance</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="p-4 rounded-lg bg-muted/50 text-center">
-                  <Target className="w-6 h-6 mx-auto mb-2 text-primary" />
-                  <p className="text-2xl font-bold text-foreground">{stats.totalInterviews}</p>
-                  <p className="text-sm text-muted-foreground">Total Interviews</p>
-                </div>
-                <div className="p-4 rounded-lg bg-muted/50 text-center">
-                  <Award className="w-6 h-6 mx-auto mb-2 text-amber-500" />
-                  <p className="text-2xl font-bold text-foreground">{stats.averageScore.toFixed(1)}/10</p>
-                  <p className="text-sm text-muted-foreground">Average Score</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <div className="grid grid-cols-2 gap-4">
+            <StatCard
+              title="Total Interviews"
+              value={stats.totalInterviews}
+              icon={Target}
+              iconColor="text-primary"
+              delay={100}
+            />
+            <StatCard
+              title="Average Score"
+              value={`${stats.averageScore.toFixed(1)}/10`}
+              icon={Award}
+              iconColor="text-warning"
+              delay={150}
+            />
+          </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 };

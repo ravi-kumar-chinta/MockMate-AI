@@ -2,12 +2,15 @@ import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { StatCard } from "@/components/ui/StatCard";
+import { AnimatedCard } from "@/components/ui/AnimatedCard";
+import { AnimatedProgress } from "@/components/ui/AnimatedProgress";
+import { GradientButton } from "@/components/ui/GradientButton";
 import { 
-  GraduationCap, LogOut, Play, History, User, 
-  TrendingUp, Target, Award, Brain, BarChart3
+  Play, History, TrendingUp, Target, Award, Brain, 
+  BarChart3, Sparkles, CheckCircle2, AlertCircle, Loader2
 } from "lucide-react";
 
 interface DashboardStats {
@@ -21,7 +24,7 @@ interface DashboardStats {
 }
 
 const Dashboard = () => {
-  const { user, loading: authLoading, signOut } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [profile, setProfile] = useState<any>(null);
   const [stats, setStats] = useState<DashboardStats>({
@@ -51,7 +54,6 @@ const Dashboard = () => {
     if (!user) return;
     setLoading(true);
 
-    // Fetch profile
     const { data: profileData } = await supabase
       .from("profiles")
       .select("*")
@@ -60,14 +62,12 @@ const Dashboard = () => {
     
     if (profileData) setProfile(profileData);
 
-    // Fetch sessions
     const { data: sessions } = await supabase
       .from("interview_sessions")
       .select("*")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false });
 
-    // Fetch questions for analysis
     const { data: questions } = await supabase
       .from("interview_questions")
       .select("*")
@@ -86,7 +86,6 @@ const Dashboard = () => {
         ? normalScores.reduce((a, b) => a + b, 0) / normalScores.length 
         : 0;
 
-      // Analyze strengths and weaknesses from feedback
       const strengths: string[] = [];
       const weaknesses: string[] = [];
       
@@ -118,77 +117,49 @@ const Dashboard = () => {
     setLoading(false);
   };
 
-  const handleSignOut = async () => {
-    await signOut();
-    navigate("/auth");
-  };
-
   if (authLoading || loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      <div className="min-h-screen gradient-page flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
-      {/* Header */}
-      <header className="border-b border-border/50 bg-background/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-primary/10">
-              <GraduationCap className="w-6 h-6 text-primary" />
-            </div>
-            <span className="font-semibold text-foreground">AI Interview Practice</span>
-          </div>
-          <div className="flex items-center gap-3">
-            <Link to="/profile">
-              <Button variant="ghost" size="sm">
-                <User className="w-4 h-4 mr-2" />
-                Profile
-              </Button>
-            </Link>
-            <Link to="/history">
-              <Button variant="ghost" size="sm">
-                <History className="w-4 h-4 mr-2" />
-                History
-              </Button>
-            </Link>
-            <Button variant="ghost" size="sm" onClick={handleSignOut}>
-              <LogOut className="w-4 h-4 mr-2" />
-              Logout
-            </Button>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen gradient-page">
+      <PageHeader />
 
       <main className="container mx-auto px-4 py-8">
         {/* Welcome Section */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground">
-            Welcome back, {profile?.full_name || user?.email?.split("@")[0]}!
+        <div className="mb-8 animate-fade-in-up">
+          <h1 className="text-3xl md:text-4xl font-bold text-foreground">
+            Welcome back, <span className="gradient-text">{profile?.full_name || user?.email?.split("@")[0]}!</span>
           </h1>
-          <p className="text-muted-foreground mt-1">Ready to practice your interview skills?</p>
+          <p className="text-muted-foreground mt-2">Ready to practice your interview skills?</p>
         </div>
 
         {/* Quick Actions */}
         <div className="grid md:grid-cols-2 gap-4 mb-8">
           <Link to="/interview">
-            <Card className="cursor-pointer hover:shadow-lg transition-all duration-300 border-primary/20 hover:border-primary/50 group">
+            <AnimatedCard 
+              variant="gradient" 
+              hover="lift" 
+              delay={50}
+              className="cursor-pointer border-primary/20 hover:border-primary/40 group"
+            >
               <CardContent className="p-6 flex items-center gap-4">
-                <div className="p-4 rounded-2xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                  <Play className="w-8 h-8 text-primary" />
+                <div className="p-4 rounded-2xl gradient-brand shadow-brand group-hover:shadow-brand-lg transition-all duration-300">
+                  <Play className="w-8 h-8 text-primary-foreground" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-lg text-foreground">Start New Interview</h3>
                   <p className="text-muted-foreground text-sm">Practice with AI-generated questions</p>
                 </div>
               </CardContent>
-            </Card>
+            </AnimatedCard>
           </Link>
           <Link to="/history">
-            <Card className="cursor-pointer hover:shadow-lg transition-all duration-300 border-border/50 hover:border-primary/30">
+            <AnimatedCard variant="default" hover="lift" delay={100} className="cursor-pointer">
               <CardContent className="p-6 flex items-center gap-4">
                 <div className="p-4 rounded-2xl bg-muted">
                   <BarChart3 className="w-8 h-8 text-muted-foreground" />
@@ -198,65 +169,51 @@ const Dashboard = () => {
                   <p className="text-muted-foreground text-sm">Review past interview sessions</p>
                 </div>
               </CardContent>
-            </Card>
+            </AnimatedCard>
           </Link>
         </div>
 
         {/* Stats Grid */}
-        <div className="grid md:grid-cols-4 gap-4 mb-8">
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">Total Interviews</p>
-                  <p className="text-3xl font-bold text-foreground">{stats.totalInterviews}</p>
-                </div>
-                <Target className="w-8 h-8 text-primary/60" />
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">Average Score</p>
-                  <p className="text-3xl font-bold text-foreground">{stats.averageScore.toFixed(1)}/10</p>
-                </div>
-                <Award className="w-8 h-8 text-amber-500/60" />
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">MCQ Accuracy</p>
-                  <p className="text-3xl font-bold text-foreground">{stats.mcqAccuracy.toFixed(0)}%</p>
-                </div>
-                <Brain className="w-8 h-8 text-emerald-500/60" />
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">Descriptive Avg</p>
-                  <p className="text-3xl font-bold text-foreground">{stats.normalAvgScore.toFixed(1)}/10</p>
-                </div>
-                <TrendingUp className="w-8 h-8 text-blue-500/60" />
-              </div>
-            </CardContent>
-          </Card>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <StatCard
+            title="Total Interviews"
+            value={stats.totalInterviews}
+            icon={Target}
+            iconColor="text-primary"
+            delay={150}
+          />
+          <StatCard
+            title="Average Score"
+            value={`${stats.averageScore.toFixed(1)}/10`}
+            icon={Award}
+            iconColor="text-warning"
+            delay={200}
+          />
+          <StatCard
+            title="MCQ Accuracy"
+            value={`${stats.mcqAccuracy.toFixed(0)}%`}
+            icon={Brain}
+            iconColor="text-success"
+            delay={250}
+          />
+          <StatCard
+            title="Descriptive Avg"
+            value={`${stats.normalAvgScore.toFixed(1)}/10`}
+            icon={TrendingUp}
+            iconColor="text-accent"
+            delay={300}
+          />
         </div>
 
         {/* Progress & Insights */}
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid md:grid-cols-2 gap-6 mb-8">
           {/* Strengths */}
-          <Card>
+          <AnimatedCard delay={350}>
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-emerald-500" />
+                <div className="p-1.5 rounded-lg bg-success/10">
+                  <CheckCircle2 className="w-4 h-4 text-success" />
+                </div>
                 Your Strengths
               </CardTitle>
               <CardDescription>Areas where you excel</CardDescription>
@@ -265,23 +222,28 @@ const Dashboard = () => {
               {stats.strengths.length > 0 ? (
                 <ul className="space-y-3">
                   {stats.strengths.map((strength, i) => (
-                    <li key={i} className="flex items-start gap-2">
-                      <div className="w-2 h-2 rounded-full bg-emerald-500 mt-2" />
+                    <li key={i} className="flex items-start gap-3 animate-slide-in-right" style={{ animationDelay: `${i * 100}ms` }}>
+                      <div className="w-2 h-2 rounded-full bg-success mt-2 flex-shrink-0" />
                       <span className="text-sm text-foreground">{strength}</span>
                     </li>
                   ))}
                 </ul>
               ) : (
-                <p className="text-sm text-muted-foreground">Complete more interviews to see your strengths</p>
+                <div className="text-center py-6">
+                  <Sparkles className="w-8 h-8 text-muted-foreground/50 mx-auto mb-2" />
+                  <p className="text-sm text-muted-foreground">Complete more interviews to see your strengths</p>
+                </div>
               )}
             </CardContent>
-          </Card>
+          </AnimatedCard>
 
           {/* Areas for Improvement */}
-          <Card>
+          <AnimatedCard delay={400}>
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
-                <Target className="w-5 h-5 text-amber-500" />
+                <div className="p-1.5 rounded-lg bg-warning/10">
+                  <AlertCircle className="w-4 h-4 text-warning" />
+                </div>
                 Areas for Improvement
               </CardTitle>
               <CardDescription>Focus on these to improve</CardDescription>
@@ -290,35 +252,45 @@ const Dashboard = () => {
               {stats.weaknesses.length > 0 ? (
                 <ul className="space-y-3">
                   {stats.weaknesses.map((weakness, i) => (
-                    <li key={i} className="flex items-start gap-2">
-                      <div className="w-2 h-2 rounded-full bg-amber-500 mt-2" />
+                    <li key={i} className="flex items-start gap-3 animate-slide-in-right" style={{ animationDelay: `${i * 100}ms` }}>
+                      <div className="w-2 h-2 rounded-full bg-warning mt-2 flex-shrink-0" />
                       <span className="text-sm text-foreground">{weakness}</span>
                     </li>
                   ))}
                 </ul>
               ) : (
-                <p className="text-sm text-muted-foreground">Complete more interviews to see areas for improvement</p>
+                <div className="text-center py-6">
+                  <Target className="w-8 h-8 text-muted-foreground/50 mx-auto mb-2" />
+                  <p className="text-sm text-muted-foreground">Complete more interviews to see areas for improvement</p>
+                </div>
               )}
             </CardContent>
-          </Card>
+          </AnimatedCard>
         </div>
 
         {/* Recent Sessions */}
         {stats.recentSessions.length > 0 && (
-          <Card className="mt-6">
+          <AnimatedCard delay={450}>
             <CardHeader>
-              <CardTitle className="text-lg">Recent Sessions</CardTitle>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <History className="w-5 h-5 text-primary" />
+                Recent Sessions
+              </CardTitle>
               <CardDescription>Your latest interview practice sessions</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {stats.recentSessions.map((session) => (
-                  <div key={session.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+                {stats.recentSessions.map((session, index) => (
+                  <div 
+                    key={session.id} 
+                    className="flex items-center justify-between p-4 rounded-xl bg-muted/50 hover:bg-muted transition-colors animate-fade-in-up"
+                    style={{ animationDelay: `${index * 50}ms` }}
+                  >
                     <div className="flex items-center gap-3">
-                      <div className={`px-2 py-1 rounded text-xs font-medium ${
+                      <div className={`px-2.5 py-1 rounded-lg text-xs font-semibold ${
                         session.question_mode === 'MCQ' 
-                          ? 'bg-blue-500/10 text-blue-600' 
-                          : 'bg-purple-500/10 text-purple-600'
+                          ? 'bg-accent/10 text-accent' 
+                          : 'bg-primary/10 text-primary'
                       }`}>
                         {session.question_mode}
                       </div>
@@ -330,7 +302,13 @@ const Dashboard = () => {
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="font-semibold text-foreground">{Number(session.average_score).toFixed(1)}/10</p>
+                      <p className={`font-bold text-lg ${
+                        Number(session.average_score) >= 7 ? 'text-success' :
+                        Number(session.average_score) >= 5 ? 'text-warning' :
+                        'text-destructive'
+                      }`}>
+                        {Number(session.average_score).toFixed(1)}/10
+                      </p>
                       <p className="text-xs text-muted-foreground">
                         {new Date(session.created_at).toLocaleDateString()}
                       </p>
@@ -339,7 +317,23 @@ const Dashboard = () => {
                 ))}
               </div>
             </CardContent>
-          </Card>
+          </AnimatedCard>
+        )}
+
+        {/* Empty State CTA */}
+        {stats.totalInterviews === 0 && (
+          <AnimatedCard delay={350} className="text-center py-12">
+            <Sparkles className="w-12 h-12 text-primary/50 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-foreground mb-2">Ready to ace your interviews?</h3>
+            <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+              Start your first practice session and get AI-powered feedback to improve your skills.
+            </p>
+            <Link to="/interview">
+              <GradientButton size="lg" icon={<Play className="w-5 h-5" />}>
+                Start Your First Interview
+              </GradientButton>
+            </Link>
+          </AnimatedCard>
         )}
       </main>
     </div>
