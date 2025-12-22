@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/ui/Logo";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { useAuth } from "@/hooks/useAuth";
 import { LogOut, User, History, Menu, X } from "lucide-react";
 import { useState } from "react";
@@ -31,7 +32,7 @@ export const PageHeader = ({ showNav = true }: PageHeaderProps) => {
           {showNav && user && (
             <>
               {/* Desktop Navigation */}
-              <nav className="hidden md:flex items-center gap-2">
+              <nav className="hidden md:flex items-center gap-1">
                 <Link to="/profile">
                   <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
                     <User className="w-4 h-4 mr-2" />
@@ -48,18 +49,28 @@ export const PageHeader = ({ showNav = true }: PageHeaderProps) => {
                   <LogOut className="w-4 h-4 mr-2" />
                   Logout
                 </Button>
+                <div className="h-5 w-px bg-border mx-1" />
+                <ThemeToggle />
               </nav>
 
               {/* Mobile Menu Button */}
-              <Button
-                variant="ghost"
-                size="icon"
-                className="md:hidden"
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              >
-                {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-              </Button>
+              <div className="md:hidden flex items-center gap-2">
+                <ThemeToggle />
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                >
+                  {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+                </Button>
+              </div>
             </>
+          )}
+
+          {!user && (
+            <div className="flex items-center gap-2">
+              <ThemeToggle />
+            </div>
           )}
         </div>
 

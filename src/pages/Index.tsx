@@ -6,6 +6,7 @@ import { Play, ArrowRight, CheckCircle2, Brain, Target, Sparkles, Loader2 } from
 import { Logo } from "@/components/ui/Logo";
 import { GradientButton } from "@/components/ui/GradientButton";
 import { AnimatedCard } from "@/components/ui/AnimatedCard";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -59,12 +60,15 @@ const Index = () => {
       <header className="relative z-10 border-b border-border/50 glass">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Logo size="md" />
-          <Link to="/auth">
-            <Button variant="ghost" className="text-muted-foreground hover:text-foreground">
-              Sign In
-              <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
-          </Link>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <Link to="/auth">
+              <Button variant="ghost" className="text-muted-foreground hover:text-foreground">
+                Sign In
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </Link>
+          </div>
         </div>
       </header>
 
