@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import mockmateLogo from "@/assets/mockmate-logo.png";
 
 interface LogoProps {
   size?: "sm" | "md" | "lg" | "xl";
@@ -23,27 +24,14 @@ export const Logo = ({ size = "md", showText = true, className }: LogoProps) => 
 
   return (
     <div className={cn("flex items-center gap-3", className)}>
-      <div className={cn(
-        "relative flex items-center justify-center rounded-xl gradient-brand shadow-brand transition-all duration-300 hover:shadow-brand-lg",
-        sizeClasses[size]
-      )}>
-        {/* MockMate AI Icon - Stylized "M" with AI accent */}
-        <svg
-          viewBox="0 0 32 32"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          className="w-2/3 h-2/3"
-        >
-          <path
-            d="M6 24V10L11 18L16 10L21 18L26 10V24"
-            stroke="white"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          <circle cx="26" cy="8" r="3" fill="hsl(var(--accent))" />
-        </svg>
-      </div>
+      <img
+        src={mockmateLogo}
+        alt="MockMate AI"
+        className={cn(
+          "object-contain transition-transform duration-300 hover:scale-105",
+          sizeClasses[size]
+        )}
+      />
       {showText && (
         <div className="flex flex-col">
           <span className={cn(

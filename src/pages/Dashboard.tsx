@@ -6,8 +6,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { PageHeader } from "@/components/layout/PageHeader";
 import { StatCard } from "@/components/ui/StatCard";
 import { AnimatedCard } from "@/components/ui/AnimatedCard";
-import { AnimatedProgress } from "@/components/ui/AnimatedProgress";
 import { GradientButton } from "@/components/ui/GradientButton";
+import { ReadinessScore } from "@/components/dashboard/ReadinessScore";
+import { ImprovementPlan } from "@/components/dashboard/ImprovementPlan";
+import { ProgressComparison } from "@/components/dashboard/ProgressComparison";
 import { 
   Play, History, TrendingUp, Target, Award, Brain, 
   BarChart3, Sparkles, CheckCircle2, AlertCircle, Loader2
@@ -21,6 +23,13 @@ interface DashboardStats {
   recentSessions: any[];
   strengths: string[];
   weaknesses: string[];
+  readinessScore: number;
+  firstAttemptScore: number | null;
+  latestAttemptScore: number | null;
+  previousSessionScore: number | null;
+  weakAreas: string[];
+  suggestedTopics: string[];
+  nextSteps: string[];
 }
 
 const Dashboard = () => {
@@ -35,6 +44,13 @@ const Dashboard = () => {
     recentSessions: [],
     strengths: [],
     weaknesses: [],
+    readinessScore: 0,
+    firstAttemptScore: null,
+    latestAttemptScore: null,
+    previousSessionScore: null,
+    weakAreas: [],
+    suggestedTopics: [],
+    nextSteps: [],
   });
   const [loading, setLoading] = useState(true);
 
@@ -101,20 +117,93 @@ const Dashboard = () => {
         }
       });
 
+      // Calculate readiness score (0-100) based on multiple factors
+      const avgScore = completedSessions.length > 0 
+        ? completedSessions.reduce((a, b) => a + Number(b.average_score), 0) / completedSessions.length 
+        : 0;
+      const mcqAccuracy = mcqTotal > 0 ? (mcqCorrect / mcqTotal) * 100 : 0;
+      const consistencyBonus = Math.min(completedSessions.length * 5, 20);
+      const readinessScore = Math.min(
+        Math.round((avgScore * 7) + (mcqAccuracy * 0.2) + consistencyBonus),
+        100
+      );
+
+      // Get first and latest attempt scores
+      const sortedCompletedSessions = completedSessions.sort(
+        (a, b) => new Date(a.created_at || 0).getTime() - new Date(b.created_at || 0).getTime()
+      );
+      const firstAttemptScore = sortedCompletedSessions.length > 0 
+        ? Number(sortedCompletedSessions[0].average_score) 
+        : null;
+      const latestAttemptScore = sortedCompletedSessions.length > 0 
+        ? Number(sortedCompletedSessions[sortedCompletedSessions.length - 1].average_score) 
+        : null;
+      const previousSessionScore = sortedCompletedSessions.length > 1
+        ? Number(sortedCompletedSessions[sortedCompletedSessions.length - 2].average_score)
+        : null;
+
+      // Generate improvement suggestions
+      const weakAreas = [...new Set(weaknesses)].slice(0, 4);
+      const suggestedTopics = generateSuggestedTopics(weakAreas, profileData?.preferred_role);
+      const nextSteps = generateNextSteps(completedSessions.length, avgScore, mcqAccuracy);
+
       setStats({
         totalInterviews: completedSessions.length,
-        averageScore: completedSessions.length > 0 
-          ? completedSessions.reduce((a, b) => a + Number(b.average_score), 0) / completedSessions.length 
-          : 0,
-        mcqAccuracy: mcqTotal > 0 ? (mcqCorrect / mcqTotal) * 100 : 0,
+        averageScore: avgScore,
+        mcqAccuracy,
         normalAvgScore: avgNormal,
         recentSessions: sessions.slice(0, 5),
         strengths: [...new Set(strengths)].slice(0, 3),
         weaknesses: [...new Set(weaknesses)].slice(0, 3),
+        readinessScore,
+        firstAttemptScore,
+        latestAttemptScore,
+        previousSessionScore,
+        weakAreas,
+        suggestedTopics,
+        nextSteps,
       });
     }
 
     setLoading(false);
+  };
+
+  const generateSuggestedTopics = (weakAreas: string[], role?: string): string[] => {
+    const topics: string[] = [];
+    if (weakAreas.some(w => w.toLowerCase().includes("technical"))) {
+      topics.push("Review data structures and algorithms fundamentals");
+    }
+    if (weakAreas.some(w => w.toLowerCase().includes("communication"))) {
+      topics.push("Practice structuring your answers using STAR method");
+    }
+    if (weakAreas.some(w => w.toLowerCase().includes("specific"))) {
+      topics.push("Include more concrete examples from your experience");
+    }
+    if (role === "AI/ML") {
+      topics.push("Deep dive into ML algorithms and their applications");
+    }
+    if (topics.length === 0) {
+      topics.push("Continue practicing to identify specific improvement areas");
+    }
+    return topics.slice(0, 3);
+  };
+
+  const generateNextSteps = (interviewCount: number, avgScore: number, mcqAccuracy: number): string[] => {
+    const steps: string[] = [];
+    if (interviewCount < 5) {
+      steps.push("Complete at least 5 interview sessions for comprehensive insights");
+    }
+    if (avgScore < 6) {
+      steps.push("Focus on understanding the core concepts before moving to harder questions");
+    }
+    if (mcqAccuracy < 70) {
+      steps.push("Practice more MCQ questions to improve quick thinking");
+    }
+    if (avgScore >= 7) {
+      steps.push("Challenge yourself with harder difficulty levels");
+    }
+    steps.push("Schedule regular practice sessions to maintain consistency");
+    return steps.slice(0, 3);
   };
 
   if (authLoading || loading) {
@@ -173,6 +262,23 @@ const Dashboard = () => {
           </Link>
         </div>
 
+        {/* Readiness Score & Progress Comparison */}
+        <div className="grid md:grid-cols-2 gap-6 mb-8">
+          <ReadinessScore 
+            score={stats.readinessScore}
+            previousScore={stats.previousSessionScore ? 
+              Math.round((stats.previousSessionScore * 7) + (stats.mcqAccuracy * 0.2) + Math.min((stats.totalInterviews - 1) * 5, 20)) : 
+              undefined
+            }
+            totalInterviews={stats.totalInterviews}
+          />
+          <ProgressComparison
+            firstAttemptScore={stats.firstAttemptScore}
+            latestAttemptScore={stats.latestAttemptScore}
+            totalInterviews={stats.totalInterviews}
+          />
+        </div>
+
         {/* Stats Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           <StatCard
@@ -205,7 +311,17 @@ const Dashboard = () => {
           />
         </div>
 
-        {/* Progress & Insights */}
+        {/* AI Improvement Plan */}
+        <div className="mb-8">
+          <ImprovementPlan
+            weakAreas={stats.weakAreas}
+            suggestedTopics={stats.suggestedTopics}
+            nextSteps={stats.nextSteps}
+            hasEnoughData={stats.totalInterviews >= 3}
+          />
+        </div>
+
+        {/* Strengths & Weaknesses */}
         <div className="grid md:grid-cols-2 gap-6 mb-8">
           {/* Strengths */}
           <AnimatedCard delay={350}>
