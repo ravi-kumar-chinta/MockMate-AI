@@ -98,28 +98,41 @@ This helps users clearly visualize their improvement journey and focus on what m
 
 ## 📷 Screenshots
 
-> Add screenshots of the application below
+### 🔐 Login Page
+![Login Page – User authentication screen where users sign in](screenshots/login.png)
 
-📌 **Login Page**  
-`screenshots/login.png`
+---
 
-📌 **User Dashboard**  
-`screenshots/dashboard.png`
+### 📊 User Dashboard
+![User Dashboard – Overview of user progress, interview history, and actions](screenshots/dashboard.png)
 
-📌 **Interview Setup Page**  
-`screenshots/interview-setup.png`
+---
 
-📌 **MCQ Question Screen**  
-`screenshots/mcq-question.png`
+### ⚙️ Interview Setup Page
+![Interview Setup Page – Configure interview role, difficulty, and settings](screenshots/interview-setup.png)
 
-📌 **Descriptive Question Screen**  
-`screenshots/descriptive-question.png`
+---
 
-📌 **AI Feedback & Score Screen**  
-`screenshots/feedback.png`
+### 📝 MCQ Question Screen
+![MCQ Question Screen – Multiple choice questions during the interview](screenshots/mcq-question.png)
 
-📌 **Session Summary Screen**  
-`screenshots/session-summary.png`
+---
+
+### ✍️ Descriptive Question Screen
+![Descriptive Question Screen – Open-ended questions for written answers](screenshots/descriptive-question.png)
+
+---
+
+### 🤖 AI Feedback & Score Screen
+![AI Feedback Screen – AI-generated score, feedback, and improvement tips](screenshots/feedback.png)
+
+---
+
+### 📄 Session Summary Screen
+![Session Summary Screen – Complete interview performance summary](screenshots/session-summary.png)
+
+
+
 
 ---
 
