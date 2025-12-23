@@ -10,6 +10,7 @@ import { GradientButton } from "@/components/ui/GradientButton";
 import { ReadinessScore } from "@/components/dashboard/ReadinessScore";
 import { ImprovementPlan } from "@/components/dashboard/ImprovementPlan";
 import { ProgressComparison } from "@/components/dashboard/ProgressComparison";
+import { WeakAreasActions } from "@/components/dashboard/WeakAreasActions";
 import { 
   Play, History, TrendingUp, Target, Award, Brain, 
   BarChart3, Sparkles, CheckCircle2, AlertCircle, Loader2
@@ -313,11 +314,17 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Progress Comparison */}
-        <div className="mb-8">
+        {/* Progress Comparison & Weak Areas Row */}
+        <div className="grid lg:grid-cols-2 gap-6 mb-8">
           <ProgressComparison
             firstAttemptScore={stats.firstAttemptScore}
             latestAttemptScore={stats.latestAttemptScore}
+            totalInterviews={stats.totalInterviews}
+          />
+          <WeakAreasActions
+            weakAreas={stats.weakAreas}
+            mcqAccuracy={stats.mcqAccuracy}
+            normalAvgScore={stats.normalAvgScore}
             totalInterviews={stats.totalInterviews}
           />
         </div>
