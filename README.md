@@ -53,6 +53,7 @@ Many students and freshers face challenges such as:
 📈 Interview history and performance analytics  
 📊 **Interview Readiness Score (0–100)** with visual indicators  
 🎯 **AI-identified weak areas & next-action suggestions**  
+🌗 **Dark / Light mode toggle for better accessibility and user comfort**  
 🎨 Modern UI with gradient themes, smooth transitions, and responsive grid layout  
 
 ---
@@ -81,6 +82,7 @@ The dashboard provides:
 - 🧠 Strength and weakness analysis  
 - 🎯 **Weak areas & next actions recommended by AI**  
 - 🔄 Performance comparison across attempts  
+- 🌗 Seamless Dark / Light mode support across all dashboard components  
 
 This helps users clearly visualize their improvement journey and focus on what matters most.
 
@@ -88,10 +90,11 @@ This helps users clearly visualize their improvement journey and focus on what m
 
 ## 🛠 Tech Stack
 
-🔹 **Platform:** Lovable AI (No-code / Low-code)  
+🔹 **Frontend:** React (Vite) + TypeScript  
+🔹 **Styling:** Tailwind CSS (Dark / Light mode support)  
+🔹 **Backend & Auth:** Supabase  
 🔹 **AI Models:** Free & open-source AI models  
-🔹 **Frontend:** Web-based UI with modern UX principles  
-🔹 **Backend Logic:** AI-driven workflows  
+🔹 **Tooling:** Node.js, ESLint, PostCSS  
 🔹 **APIs:** No paid APIs used  
 
 ---
@@ -131,9 +134,6 @@ This helps users clearly visualize their improvement journey and focus on what m
 ### 📄 Session Summary Screen
 ![Session Summary Screen – Complete interview performance summary](screenshots/session-summary.png)
 
-
-
-
 ---
 
 ## 🎯 Use Cases
@@ -160,7 +160,6 @@ This helps users clearly visualize their improvement journey and focus on what m
 
 🚀 Voice-based interview mode  
 📄 Resume-based personalized question generation  
-🌙 Dark mode user interface  
 📤 Export performance reports as PDF  
 📊 Admin dashboard with advanced analytics  
 
