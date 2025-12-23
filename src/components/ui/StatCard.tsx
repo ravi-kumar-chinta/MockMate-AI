@@ -26,7 +26,7 @@ export const StatCard = ({
   return (
     <div
       className={cn(
-        "relative overflow-hidden rounded-xl border border-border bg-card p-4 shadow-md transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-lg animate-fade-in-up",
+        "relative overflow-hidden rounded-xl border border-border bg-card p-4 shadow-md transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-lg animate-fade-in-up h-full flex flex-col justify-center",
         className
       )}
       style={{

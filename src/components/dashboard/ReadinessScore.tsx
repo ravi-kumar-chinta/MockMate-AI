@@ -28,8 +28,8 @@ export const ReadinessScore = ({ score, previousScore, totalInterviews }: Readin
   const readinessLevel = getReadinessLevel();
 
   return (
-    <AnimatedCard variant="gradient" delay={50} className="overflow-hidden h-full">
-      <CardContent className="flex flex-col items-center justify-center h-full py-8 px-4">
+    <AnimatedCard variant="gradient" delay={50} className="overflow-hidden h-full min-h-full">
+      <CardContent className="flex flex-col items-center justify-center h-full py-6 px-4">
         <p className="text-sm font-semibold text-muted-foreground mb-4">Interview Readiness</p>
         <CircularProgress
           value={score}

@@ -263,10 +263,10 @@ const Dashboard = () => {
           </Link>
         </div>
 
-        {/* Readiness Score & Stats Row - 2 columns layout */}
-        <div className="grid lg:grid-cols-3 gap-4 mb-8">
+        {/* Readiness Score & Stats Row - CSS Grid with fixed row heights */}
+        <div className="grid lg:grid-cols-3 lg:grid-rows-2 gap-4 mb-8" style={{ gridAutoRows: '1fr' }}>
           {/* Readiness Score - Large card spanning 2 rows on left */}
-          <div className="lg:row-span-2">
+          <div className="lg:row-span-2 lg:col-span-1">
             <ReadinessScore 
               score={stats.readinessScore}
               previousScore={stats.previousSessionScore ? 
@@ -277,41 +277,37 @@ const Dashboard = () => {
             />
           </div>
           
-          {/* Stats Grid - 2x2 grid on right taking 2 columns */}
-          <div className="lg:col-span-2 grid grid-cols-2 gap-4">
-            <StatCard
-              title="Total Interviews"
-              value={stats.totalInterviews}
-              icon={Target}
-              iconColor="text-primary"
-              delay={100}
-              className="h-full"
-            />
-            <StatCard
-              title="Average Score"
-              value={`${stats.averageScore.toFixed(1)}/10`}
-              icon={Award}
-              iconColor="text-warning"
-              delay={150}
-              className="h-full"
-            />
-            <StatCard
-              title="MCQ Accuracy"
-              value={`${stats.mcqAccuracy.toFixed(0)}%`}
-              icon={Brain}
-              iconColor="text-success"
-              delay={200}
-              className="h-full"
-            />
-            <StatCard
-              title="Descriptive Avg"
-              value={`${stats.normalAvgScore.toFixed(1)}/10`}
-              icon={TrendingUp}
-              iconColor="text-accent"
-              delay={250}
-              className="h-full"
-            />
-          </div>
+          {/* Top Row Stats */}
+          <StatCard
+            title="Total Interviews"
+            value={stats.totalInterviews}
+            icon={Target}
+            iconColor="text-primary"
+            delay={100}
+          />
+          <StatCard
+            title="Average Score"
+            value={`${stats.averageScore.toFixed(1)}/10`}
+            icon={Award}
+            iconColor="text-warning"
+            delay={150}
+          />
+          
+          {/* Bottom Row Stats */}
+          <StatCard
+            title="MCQ Accuracy"
+            value={`${stats.mcqAccuracy.toFixed(0)}%`}
+            icon={Brain}
+            iconColor="text-success"
+            delay={200}
+          />
+          <StatCard
+            title="Descriptive Avg"
+            value={`${stats.normalAvgScore.toFixed(1)}/10`}
+            icon={TrendingUp}
+            iconColor="text-accent"
+            delay={250}
+          />
         </div>
 
         {/* Progress Comparison & Weak Areas Row */}
